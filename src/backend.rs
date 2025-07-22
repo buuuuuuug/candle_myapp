@@ -142,9 +142,9 @@ impl BackendManager {
         }
 
         let duration = start.elapsed();
-        let avg_time_ms = duration.as_millis() as f64 / iterations as f64;
+        let avg_time_ns = duration.as_nanos() as f64 / iterations as f64;
         
-        Ok(avg_time_ms)
+        Ok(avg_time_ns)
     }
 
     /// Display backend status and information
@@ -155,8 +155,8 @@ impl BackendManager {
         
         // Run benchmark
         match self.benchmark_backend() {
-            Ok(time_ms) => {
-                println!("   Performance: {:.2}ms (1000x1000 matrix multiplication)", time_ms);
+            Ok(time_ns) => {
+                println!("   Performance: {:.2} ns (1000x1000 matrix multiplication)", time_ns);
             }
             Err(e) => {
                 println!("   Performance: Benchmark failed - {}", e);

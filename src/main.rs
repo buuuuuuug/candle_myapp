@@ -33,32 +33,32 @@ fn main() -> Result<()> {
         let vec = vec![1u32, 2, 3, 4, 5, 6];
         Tensor::from_vec(vec, (2, 3), device)?
     });
-    println!("   Original tensor (2x3): {:?} (created in {:.2}ms)", tensor, duration.as_millis());
+    println!("   Original tensor (2x3): {:?} (created in {:.2}ns)", tensor, duration.as_nanos());
     
     // Convert to 2D vector with timing
     let (vec_2d, duration) = time_operation!(performance_monitor, "tensor_to_vec2", {
         tensor.to_vec2::<u32>()?
     });
-    println!("   As 2D vector: {:?} (converted in {:.2}ms)", vec_2d, duration.as_millis());
+    println!("   As 2D vector: {:?} (converted in {:.2}ns)", vec_2d, duration.as_nanos());
     
     // Create a float tensor for more operations
     let (float_tensor, duration) = time_operation!(performance_monitor, "float_tensor_creation", {
         let float_data = vec![1.0f32, 2.0, 3.0, 4.0];
         Tensor::from_vec(float_data, (2, 2), device)?
     });
-    println!("   Float tensor (2x2): {:?} (created in {:.2}ms)", float_tensor, duration.as_millis());
+    println!("   Float tensor (2x2): {:?} (created in {:.2}ns)", float_tensor, duration.as_nanos());
     
     // Demonstrate transpose with timing
     let (transposed, duration) = time_operation!(performance_monitor, "tensor_transpose", {
         float_tensor.transpose(0, 1)?
     });
-    println!("   Transposed: {:?} (transposed in {:.2}ms)", transposed, duration.as_millis());
+    println!("   Transposed: {:?} (transposed in {:.2}ns)", transposed, duration.as_nanos());
     
     // Demonstrate matrix multiplication with timing
     let (matrix_result, duration) = time_operation!(performance_monitor, "matrix_multiplication", {
         float_tensor.matmul(&transposed)?
     });
-    println!("   Matrix multiplication result: {:?} (computed in {:.2}ms)", matrix_result, duration.as_millis());
+    println!("   Matrix multiplication result: {:?} (computed in {:.2}ns)", matrix_result, duration.as_nanos());
     
     println!("\n✅ Backend manager working correctly!");
     

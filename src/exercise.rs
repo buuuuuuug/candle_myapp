@@ -99,8 +99,8 @@ impl ExerciseResult {
         if !self.metrics.is_empty() {
             println!("   Performance:");
             for metric in &self.metrics {
-                println!("     {}: {:.2}ms ({})", 
-                    metric.operation, metric.duration.as_millis(), metric.backend);
+                println!("     {}: {:.2}ns ({})", 
+                    metric.operation, metric.duration.as_nanos(), metric.backend);
             }
         }
 

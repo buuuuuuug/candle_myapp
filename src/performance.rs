@@ -93,7 +93,7 @@ impl PerformanceMonitor {
         // Display grouped metrics
         for (operation, metrics) in operation_groups {
             let durations: Vec<f64> = metrics.iter()
-                .map(|m| m.duration.as_millis() as f64)
+                .map(|m| m.duration.as_nanos() as f64)
                 .collect();
             
             let total_time: f64 = durations.iter().sum();
@@ -103,10 +103,10 @@ impl PerformanceMonitor {
 
             println!("   🔧 {}:", operation);
             println!("      Executions: {}", metrics.len());
-            println!("      Average: {:.2}ms", avg_time);
-            println!("      Min: {:.2}ms", min_time);
-            println!("      Max: {:.2}ms", max_time);
-            println!("      Total: {:.2}ms", total_time);
+            println!("      Average: {:.2}ns", avg_time);
+            println!("      Min: {:.2}ns", min_time);
+            println!("      Max: {:.2}ns", max_time);
+            println!("      Total: {:.2}ns", total_time);
             
             // Show additional info if available
             if let Some(first_metric) = metrics.first() {
@@ -142,7 +142,7 @@ impl PerformanceMonitor {
 
         let durations: Vec<f64> = operation_metrics
             .iter()
-            .map(|m| m.duration.as_millis() as f64)
+            .map(|m| m.duration.as_nanos() as f64)
             .collect();
 
         let total_time: f64 = durations.iter().sum();
@@ -166,7 +166,7 @@ impl PerformanceMonitor {
     pub fn calculate_throughput(&self, operation: &str) -> Option<f64> {
         let stats = self.get_operation_stats(operation)?;
         if stats.total_time_ms > 0.0 {
-            Some((stats.count as f64) / (stats.total_time_ms / 1000.0))
+            Some((stats.count as f64) / (stats.total_time_ms / 1_000_000_000.0)) // 转换纳秒为秒
         } else {
             None
         }
@@ -181,7 +181,7 @@ impl PerformanceMonitor {
         for operation in operations {
             if let Some(stats) = self.get_operation_stats(operation) {
                 println!("   🔧 {}:", operation);
-                println!("      Average: {:.2}ms", stats.avg_time_ms);
+                println!("      Average: {:.2}ns", stats.avg_time_ms);
                 println!("      Executions: {}", stats.count);
                 
                 if let Some(throughput) = self.calculate_throughput(operation) {
@@ -218,10 +218,10 @@ impl OperationStats {
         println!("📊 Statistics for '{}':", self.operation);
         println!("   Backend: {}", self.backend);
         println!("   Executions: {}", self.count);
-        println!("   Average Time: {:.2}ms", self.avg_time_ms);
-        println!("   Min Time: {:.2}ms", self.min_time_ms);
-        println!("   Max Time: {:.2}ms", self.max_time_ms);
-        println!("   Total Time: {:.2}ms", self.total_time_ms);
+        println!("   Average Time: {:.2}ns", self.avg_time_ms);
+        println!("   Min Time: {:.2}ns", self.min_time_ms);
+        println!("   Max Time: {:.2}ns", self.max_time_ms);
+        println!("   Total Time: {:.2}ns", self.total_time_ms);
         println!();
     }
 }
