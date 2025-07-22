@@ -73,9 +73,11 @@ fn main() -> Result<()> {
     );
     
     // Add tensor creation exercises
-    use exercises::tensor_basics::{TensorCreationExercise, TensorFromDataExercise, TensorShapeExercise};
+    use exercises::tensor_basics::{TensorCreationExercise, TensorFromDataExercise, TensorIndexingExercise, TensorSlicingPatternsExercise, TensorShapeExercise};
     basic_tensors.add_exercise(Box::new(TensorCreationExercise));
     basic_tensors.add_exercise(Box::new(TensorFromDataExercise));
+    basic_tensors.add_exercise(Box::new(TensorIndexingExercise));
+    basic_tensors.add_exercise(Box::new(TensorSlicingPatternsExercise));
     basic_tensors.add_exercise(Box::new(TensorShapeExercise));
     
     let matrix_ops = ExerciseCategory::new(
@@ -108,10 +110,10 @@ fn main() -> Result<()> {
     
     println!("✅ Performance monitoring system working correctly!");
     
-    // Run a tensor creation exercise as a demo
-    println!("\n🧪 Running Tensor Creation Exercise Demo:");
+    // Run a tensor indexing exercise as a demo
+    println!("\n🧪 Running Tensor Indexing Exercise Demo:");
     let category_name = "Basic Tensors";
-    let exercise_name = "Tensor Creation";
+    let exercise_name = "Tensor Indexing and Slicing";
     
     match framework.run_exercise(category_name, exercise_name, device) {
         Ok(result) => {

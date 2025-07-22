@@ -74,10 +74,10 @@ mod tests {
         let stats = monitor.get_operation_stats("test_op").unwrap();
         assert_eq!(stats.operation, "test_op");
         assert_eq!(stats.count, 5);
-        assert_eq!(stats.total_time_ms, 150.0); // 10+20+30+40+50
-        assert_eq!(stats.avg_time_ms, 30.0);
-        assert_eq!(stats.min_time_ms, 10.0);
-        assert_eq!(stats.max_time_ms, 50.0);
+        assert_eq!(stats.total_time_ms, 150_000_000.0); // 10+20+30+40+50 (in nanoseconds)
+        assert_eq!(stats.avg_time_ms, 30_000_000.0); // 30ms in nanoseconds
+        assert_eq!(stats.min_time_ms, 10_000_000.0); // 10ms in nanoseconds
+        assert_eq!(stats.max_time_ms, 50_000_000.0); // 50ms in nanoseconds
         assert_eq!(stats.backend, BackendType::Cpu);
         
         // Test non-existent operation

@@ -35,7 +35,7 @@
   - Write tests to verify tensor creation correctness
   - _Requirements: 2.1_
 
-- [ ] 5.2 Implement tensor indexing and slicing exercises
+- [x] 5.2 Implement tensor indexing and slicing exercises
   - Create exercises demonstrating tensor indexing operations
   - Implement slicing examples with different patterns
   - Add boundary condition and error handling examples

@@ -235,6 +235,275 @@ impl Exercise for TensorFromDataExercise {
     }
 }
 
+/// Exercise for tensor indexing and slicing operations
+pub struct TensorIndexingExercise;
+
+impl Exercise for TensorIndexingExercise {
+    fn name(&self) -> &str {
+        "Tensor Indexing and Slicing"
+    }
+
+    fn description(&self) -> &str {
+        "Learn tensor indexing, slicing, and element access operations"
+    }
+
+    fn run(&self, device: &Device) -> Result<ExerciseResult> {
+        let mut result = ExerciseResult::new();
+        
+        // Add educational notes
+        result.add_educational_note(
+            "Tensor indexing and slicing are fundamental operations for accessing and manipulating tensor data."
+        );
+        result.add_educational_note(
+            "Candle provides various methods for indexing including narrow, get, and slice operations."
+        );
+        
+        // Create base tensors for demonstrations
+        let matrix_data = vec![1.0f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0];
+        let matrix_3x4 = Tensor::from_vec(matrix_data.clone(), (3, 4), device)?;
+        
+        result.add_output("\nBase tensor for indexing demonstrations:");
+        result.add_output(&format!("   Matrix (3x4): {:?}", matrix_3x4));
+        result.add_output(&format!("   Shape: {:?}", matrix_3x4.shape()));
+        result.add_output(&format!("   Values: {:?}", matrix_3x4.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("base_matrix", &matrix_3x4)?);
+        
+        // Example 1: Get single element
+        result.add_output("\n1. Getting single elements:");
+        let element_0_0 = matrix_3x4.get(0)?.get(0)?;
+        result.add_output(&format!("   Element at [0,0]: {:?}", element_0_0));
+        result.add_output(&format!("   Value: {:?}", element_0_0.to_vec0::<f32>()?));
+        
+        let element_1_2 = matrix_3x4.get(1)?.get(2)?;
+        result.add_output(&format!("   Element at [1,2]: {:?}", element_1_2));
+        result.add_output(&format!("   Value: {:?}", element_1_2.to_vec0::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("element_1_2", &element_1_2)?);
+        
+        // Example 2: Get entire rows and columns
+        result.add_output("\n2. Getting rows and columns:");
+        let row_1 = matrix_3x4.get(1)?;
+        result.add_output(&format!("   Row 1: {:?}", row_1));
+        result.add_output(&format!("   Values: {:?}", row_1.to_vec1::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("row_1", &row_1)?);
+        
+        // Get column using transpose and get
+        let transposed = matrix_3x4.transpose(0, 1)?;
+        let col_2 = transposed.get(2)?;
+        result.add_output(&format!("   Column 2: {:?}", col_2));
+        result.add_output(&format!("   Values: {:?}", col_2.to_vec1::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("col_2", &col_2)?);
+        
+        // Example 3: Narrow operations (slicing)
+        result.add_output("\n3. Narrow operations (slicing):");
+        
+        // Narrow along dimension 0 (rows)
+        let rows_slice = matrix_3x4.narrow(0, 1, 2)?; // Start at row 1, take 2 rows
+        result.add_output(&format!("   Rows 1-2: {:?}", rows_slice));
+        result.add_output(&format!("   Shape: {:?}", rows_slice.shape()));
+        result.add_output(&format!("   Values: {:?}", rows_slice.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("rows_slice", &rows_slice)?);
+        
+        // Narrow along dimension 1 (columns)
+        let cols_slice = matrix_3x4.narrow(1, 1, 2)?; // Start at col 1, take 2 cols
+        result.add_output(&format!("   Columns 1-2: {:?}", cols_slice));
+        result.add_output(&format!("   Shape: {:?}", cols_slice.shape()));
+        result.add_output(&format!("   Values: {:?}", cols_slice.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("cols_slice", &cols_slice)?);
+        
+        // Example 4: Combined slicing
+        result.add_output("\n4. Combined slicing:");
+        let submatrix = matrix_3x4.narrow(0, 1, 2)?.narrow(1, 1, 2)?;
+        result.add_output(&format!("   Submatrix [1:3, 1:3]: {:?}", submatrix));
+        result.add_output(&format!("   Shape: {:?}", submatrix.shape()));
+        result.add_output(&format!("   Values: {:?}", submatrix.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("submatrix", &submatrix)?);
+        
+        // Example 5: Working with 3D tensors
+        result.add_output("\n5. 3D tensor indexing:");
+        let tensor_3d_data: Vec<f32> = (1..=24).map(|x| x as f32).collect();
+        let tensor_3d = Tensor::from_vec(tensor_3d_data, (2, 3, 4), device)?;
+        result.add_output(&format!("   3D tensor (2x3x4): {:?}", tensor_3d));
+        result.add_output(&format!("   Shape: {:?}", tensor_3d.shape()));
+        
+        // Get first "slice" along dimension 0
+        let slice_0 = tensor_3d.get(0)?;
+        result.add_output(&format!("   First slice [0,:,:]: {:?}", slice_0));
+        result.add_output(&format!("   Shape: {:?}", slice_0.shape()));
+        result.add_output(&format!("   Values: {:?}", slice_0.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("slice_0", &slice_0)?);
+        
+        // Narrow along multiple dimensions
+        let narrow_3d = tensor_3d.narrow(0, 0, 1)?.narrow(1, 1, 2)?.narrow(2, 1, 2)?;
+        result.add_output(&format!("   Narrow 3D [0:1, 1:3, 1:3]: {:?}", narrow_3d));
+        result.add_output(&format!("   Shape: {:?}", narrow_3d.shape()));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("narrow_3d", &narrow_3d)?);
+        
+        // Example 6: Index select operations
+        result.add_output("\n6. Advanced indexing patterns:");
+        
+        // Create index tensor for demonstration
+        let indices = Tensor::new(&[0u32, 2], device)?;
+        let selected_rows = matrix_3x4.index_select(&indices, 0)?;
+        result.add_output(&format!("   Selected rows [0, 2]: {:?}", selected_rows));
+        result.add_output(&format!("   Shape: {:?}", selected_rows.shape()));
+        result.add_output(&format!("   Values: {:?}", selected_rows.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("selected_rows", &selected_rows)?);
+        
+        // Example 7: Boundary conditions and error handling
+        result.add_output("\n7. Boundary conditions:");
+        result.add_output(&format!("   Original matrix shape: {:?}", matrix_3x4.shape()));
+        result.add_output("   Valid narrow: narrow(0, 0, 3) - takes all rows");
+        let all_rows = matrix_3x4.narrow(0, 0, 3)?;
+        result.add_output(&format!("   Result shape: {:?}", all_rows.shape()));
+        
+        result.add_output("   Valid narrow: narrow(1, 2, 2) - takes last 2 columns");
+        let last_cols = matrix_3x4.narrow(1, 2, 2)?;
+        result.add_output(&format!("   Result shape: {:?}", last_cols.shape()));
+        result.add_output(&format!("   Values: {:?}", last_cols.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("last_cols", &last_cols)?);
+        
+        // Add performance metrics
+        let mut additional_info = HashMap::new();
+        additional_info.insert("total_operations".to_string(), "12".to_string());
+        additional_info.insert("tensor_dimensions".to_string(), "2D and 3D".to_string());
+        
+        result.add_metric(crate::exercise::Metric {
+            operation: "tensor_indexing_exercise".to_string(),
+            duration: Duration::from_millis(0), // Will be updated by the framework
+            backend: format!("{:?}", device),
+            additional_info,
+        });
+        
+        Ok(result)
+    }
+}
+
+/// Exercise for advanced tensor slicing patterns
+pub struct TensorSlicingPatternsExercise;
+
+impl Exercise for TensorSlicingPatternsExercise {
+    fn name(&self) -> &str {
+        "Advanced Tensor Slicing Patterns"
+    }
+
+    fn description(&self) -> &str {
+        "Explore advanced slicing patterns and tensor manipulation techniques"
+    }
+
+    fn run(&self, device: &Device) -> Result<ExerciseResult> {
+        let mut result = ExerciseResult::new();
+        
+        // Add educational notes
+        result.add_educational_note(
+            "Advanced slicing patterns enable complex data manipulation and are essential for neural network operations."
+        );
+        result.add_educational_note(
+            "Understanding strided access, masked indexing, and conditional selection is crucial for efficient tensor operations."
+        );
+        
+        // Create base tensor for demonstrations
+        let data: Vec<f32> = (1..=20).map(|x| x as f32).collect();
+        let matrix_4x5 = Tensor::from_vec(data, (4, 5), device)?;
+        
+        result.add_output("\nBase tensor for advanced slicing:");
+        result.add_output(&format!("   Matrix (4x5): {:?}", matrix_4x5));
+        result.add_output(&format!("   Values: {:?}", matrix_4x5.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("base_matrix_4x5", &matrix_4x5)?);
+        
+        // Example 1: Strided slicing simulation
+        result.add_output("\n1. Strided access patterns:");
+        
+        // Every other row
+        let indices_rows = Tensor::new(&[0u32, 2], device)?;
+        let every_other_row = matrix_4x5.index_select(&indices_rows, 0)?;
+        result.add_output(&format!("   Every other row [0, 2]: {:?}", every_other_row));
+        result.add_output(&format!("   Values: {:?}", every_other_row.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("every_other_row", &every_other_row)?);
+        
+        // Every other column
+        let indices_cols = Tensor::new(&[0u32, 2, 4], device)?;
+        let every_other_col = matrix_4x5.index_select(&indices_cols, 1)?;
+        result.add_output(&format!("   Every other column [0, 2, 4]: {:?}", every_other_col));
+        result.add_output(&format!("   Values: {:?}", every_other_col.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("every_other_col", &every_other_col)?);
+        
+        // Example 2: Diagonal extraction
+        result.add_output("\n2. Diagonal extraction:");
+        let square_data: Vec<f32> = (1..=16).map(|x| x as f32).collect();
+        let square_matrix = Tensor::from_vec(square_data, (4, 4), device)?;
+        result.add_output(&format!("   Square matrix (4x4): {:?}", square_matrix));
+        result.add_output(&format!("   Values: {:?}", square_matrix.to_vec2::<f32>()?));
+        
+        // Extract diagonal elements manually
+        let diag_0_0 = square_matrix.get(0)?.get(0)?;
+        let diag_1_1 = square_matrix.get(1)?.get(1)?;
+        let diag_2_2 = square_matrix.get(2)?.get(2)?;
+        let diag_3_3 = square_matrix.get(3)?.get(3)?;
+        
+        result.add_output(&format!("   Diagonal elements: [{:.0}, {:.0}, {:.0}, {:.0}]", 
+            diag_0_0.to_vec0::<f32>()?, 
+            diag_1_1.to_vec0::<f32>()?, 
+            diag_2_2.to_vec0::<f32>()?, 
+            diag_3_3.to_vec0::<f32>()?));
+        
+        // Example 3: Block extraction
+        result.add_output("\n3. Block extraction:");
+        let top_left = square_matrix.narrow(0, 0, 2)?.narrow(1, 0, 2)?;
+        result.add_output(&format!("   Top-left 2x2 block: {:?}", top_left));
+        result.add_output(&format!("   Values: {:?}", top_left.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("top_left_block", &top_left)?);
+        
+        let bottom_right = square_matrix.narrow(0, 2, 2)?.narrow(1, 2, 2)?;
+        result.add_output(&format!("   Bottom-right 2x2 block: {:?}", bottom_right));
+        result.add_output(&format!("   Values: {:?}", bottom_right.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("bottom_right_block", &bottom_right)?);
+        
+        // Example 4: Conditional selection simulation
+        result.add_output("\n4. Conditional selection patterns:");
+        
+        // Create a mask-like selection (simulate selecting elements > 10)
+        let large_indices = Tensor::new(&[2u32, 3], device)?; // Rows that likely contain values > 10
+        let large_value_rows = matrix_4x5.index_select(&large_indices, 0)?;
+        result.add_output(&format!("   Rows with larger values [2, 3]: {:?}", large_value_rows));
+        result.add_output(&format!("   Values: {:?}", large_value_rows.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("large_value_rows", &large_value_rows)?);
+        
+        // Example 5: Reshaping after slicing
+        result.add_output("\n5. Reshaping after slicing:");
+        let slice_and_reshape = matrix_4x5.narrow(0, 1, 2)?.narrow(1, 1, 3)?.reshape((6,))?;
+        result.add_output(&format!("   Sliced and reshaped to 1D: {:?}", slice_and_reshape));
+        result.add_output(&format!("   Shape: {:?}", slice_and_reshape.shape()));
+        result.add_output(&format!("   Values: {:?}", slice_and_reshape.to_vec1::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("slice_and_reshape", &slice_and_reshape)?);
+        
+        // Example 6: Multiple index selections
+        result.add_output("\n6. Multiple index selections:");
+        let row_indices = Tensor::new(&[0u32, 3], device)?;
+        let col_indices = Tensor::new(&[1u32, 3], device)?;
+        
+        let selected_rows_first = matrix_4x5.index_select(&row_indices, 0)?;
+        let final_selection = selected_rows_first.index_select(&col_indices, 1)?;
+        result.add_output(&format!("   Selected [0,3] rows then [1,3] cols: {:?}", final_selection));
+        result.add_output(&format!("   Shape: {:?}", final_selection.shape()));
+        result.add_output(&format!("   Values: {:?}", final_selection.to_vec2::<f32>()?));
+        result.add_tensor(TensorInfo::from_tensor::<f32>("final_selection", &final_selection)?);
+        
+        // Add performance metrics
+        let mut additional_info = HashMap::new();
+        additional_info.insert("total_operations".to_string(), "10".to_string());
+        additional_info.insert("pattern_types".to_string(), "strided, diagonal, block, conditional".to_string());
+        
+        result.add_metric(crate::exercise::Metric {
+            operation: "tensor_slicing_patterns_exercise".to_string(),
+            duration: Duration::from_millis(0), // Will be updated by the framework
+            backend: format!("{:?}", device),
+            additional_info,
+        });
+        
+        Ok(result)
+    }
+}
+
 /// Exercise for tensor shape manipulation
 pub struct TensorShapeExercise;
 
@@ -371,6 +640,42 @@ mod tests {
         assert!(exercise_result.success);
         assert!(!exercise_result.output.is_empty());
         assert!(!exercise_result.tensors.is_empty());
+    }
+    
+    #[test]
+    fn test_tensor_indexing_exercise() {
+        let exercise = TensorIndexingExercise;
+        let device = Device::Cpu;
+        
+        let result = exercise.run(&device);
+        if let Err(e) = &result {
+            println!("Error running TensorIndexingExercise: {}", e);
+        }
+        assert!(result.is_ok());
+        
+        let exercise_result = result.unwrap();
+        assert!(exercise_result.success);
+        assert!(!exercise_result.output.is_empty());
+        assert!(!exercise_result.tensors.is_empty());
+        assert!(!exercise_result.educational_notes.is_empty());
+    }
+    
+    #[test]
+    fn test_tensor_slicing_patterns_exercise() {
+        let exercise = TensorSlicingPatternsExercise;
+        let device = Device::Cpu;
+        
+        let result = exercise.run(&device);
+        if let Err(e) = &result {
+            println!("Error running TensorSlicingPatternsExercise: {}", e);
+        }
+        assert!(result.is_ok());
+        
+        let exercise_result = result.unwrap();
+        assert!(exercise_result.success);
+        assert!(!exercise_result.output.is_empty());
+        assert!(!exercise_result.tensors.is_empty());
+        assert!(!exercise_result.educational_notes.is_empty());
     }
     
     #[test]
