@@ -80,10 +80,15 @@ fn main() -> Result<()> {
     basic_tensors.add_exercise(Box::new(TensorSlicingPatternsExercise));
     basic_tensors.add_exercise(Box::new(TensorShapeExercise));
     
-    let matrix_ops = ExerciseCategory::new(
+    let mut matrix_ops = ExerciseCategory::new(
         "Matrix Operations", 
         "Linear algebra operations and transformations"
     );
+    
+    // Add matrix operation exercises
+    use exercises::matrix_operations::{MatrixArithmeticExercise, BroadcastingExercise};
+    matrix_ops.add_exercise(Box::new(MatrixArithmeticExercise));
+    matrix_ops.add_exercise(Box::new(BroadcastingExercise));
     
     let neural_networks = ExerciseCategory::new(
         "Neural Networks", 
@@ -110,10 +115,10 @@ fn main() -> Result<()> {
     
     println!("✅ Performance monitoring system working correctly!");
     
-    // Run a tensor indexing exercise as a demo
-    println!("\n🧪 Running Tensor Indexing Exercise Demo:");
-    let category_name = "Basic Tensors";
-    let exercise_name = "Tensor Indexing and Slicing";
+    // Run a matrix arithmetic exercise as a demo
+    println!("\n🧪 Running Matrix Arithmetic Exercise Demo:");
+    let category_name = "Matrix Operations";
+    let exercise_name = "Matrix Arithmetic Operations";
     
     match framework.run_exercise(category_name, exercise_name, device) {
         Ok(result) => {

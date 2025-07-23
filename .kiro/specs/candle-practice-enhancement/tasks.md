@@ -43,7 +43,7 @@
   - _Requirements: 2.5_
 
 - [ ] 6. Create Matrix Operations exercises
-- [ ] 6.1 Implement basic matrix arithmetic exercises
+- [x] 6.1 Implement basic matrix arithmetic exercises
   - Create exercises for matrix addition and subtraction
   - Implement element-wise operations examples
   - Add broadcasting demonstration exercises
